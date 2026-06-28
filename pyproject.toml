@@ -1,0 +1,30 @@
+[project]
+name = "bca_beta"
+version = "0.1.0"
+description = "Tier 0 Beta belief-update layer for the Bayesian Chronicle Agents redesign"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy>=1.26",
+    "networkx>=3.0",
+    "scipy>=1.11",
+    "matplotlib>=3.7",
+    "pandas>=2.0",
+    "openai>=1.40",
+    "python-dotenv>=1.0",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=8.0"]
+
+# Run the package in-place from the parent directory:
+#   python -m pytest bca_beta
+#   python -m bca_beta.experiments.tier0
+[tool.pytest.ini_options]
+addopts = "-q"
+# Silence deprecation warnings emitted from third-party libraries on import
+# (pandas -> pytz/dateutil, matplotlib -> pyparsing); our own code stays clean.
+filterwarnings = [
+    "ignore:datetime.datetime.utcfromtimestamp.*",
+    "ignore::pyparsing.warnings.PyparsingDeprecationWarning",
+]
