@@ -8,7 +8,8 @@ import pandas as pd
 from bca_beta import analysis
 
 
-def run_tier2(sliders_csv: str | Path, out_dir: str | Path, make_plots: bool = True) -> dict:
+def run_tier2(sliders_csv: str | Path, out_dir: str | Path, make_plots: bool = True,
+              provenance: dict | None = None) -> dict:
     """
     Read a combined slider log and compute belief↔slider correlation metrics.
 
@@ -36,6 +37,8 @@ def run_tier2(sliders_csv: str | Path, out_dir: str | Path, make_plots: bool = T
         "by_regime": {r: analysis.belief_slider_correlation(g)
                       for r, g in df.groupby("regime")} if "regime" in df else {}
     }
+    if provenance is not None:
+        metrics["provenance"] = provenance
 
     # Write outputs
     df.to_csv(out_dir / "belief_vs_slider.csv", index=False)
@@ -69,9 +72,17 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--sliders", required=True, help="Path to combined slider CSV")
     parser.add_argument("--out", required=True, help="Output directory")
     parser.add_argument("--no-plot", action="store_true", help="Skip plot generation")
+    parser.add_argument("--model-key", default=None,
+                        help="tag the metrics with the model this slider log came from")
 
     args = parser.parse_args(argv)
-    run_tier2(args.sliders, args.out, make_plots=not args.no_plot)
+    provenance = None
+    if args.model_key:
+        from bca_beta import models
+        spec = models.get_model_spec(args.model_key)
+        provenance = {"model_key": spec.key, "model_id": spec.model_id,
+                      "endpoint": spec.endpoint_label}
+    run_tier2(args.sliders, args.out, make_plots=not args.no_plot, provenance=provenance)
     return 0
 
 

@@ -12,6 +12,7 @@ import re
 from dataclasses import dataclass
 from typing import Optional, Protocol, runtime_checkable
 
+from bca_beta import params
 from bca_beta.calibration import Calibration
 from bca_beta.llm import JSONCache, LLMClient
 
@@ -69,11 +70,17 @@ class OpenAIStanceAppraiser:
         client: LLMClient,
         cache: Optional[JSONCache] = None,
         calibration: Optional[Calibration] = None,
+        chat_params: Optional[dict] = None,
     ) -> None:
         self.model = model
         self.client = client
         self.cache = cache
         self.calibration = calibration
+        # Sampling params from the centralized policy (deterministic appraisal).
+        self.chat_params = (
+            dict(chat_params) if chat_params is not None
+            else params.role_chat_params("appraiser")
+        )
 
     def build_messages(self, *, utterance: str, a_plus: str, a_minus: str) -> "list[dict]":
         """Construct the chat messages for one appraisal."""
@@ -105,7 +112,7 @@ class OpenAIStanceAppraiser:
             if hit is not None:
                 return hit
 
-        result = self.client.chat(self.model, messages, temperature=0.0)
+        result = self.client.chat(self.model, messages, **self.chat_params)
         p_plus_raw, rationale, parse_error = parse_appraiser_response(result.text)
         record = {
             "p_plus_raw": 0.5 if p_plus_raw is None else p_plus_raw,

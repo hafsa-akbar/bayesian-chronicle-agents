@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
-from typing import Any, Optional, Sequence
+from typing import Sequence
 
 import networkx as nx
 import numpy as np

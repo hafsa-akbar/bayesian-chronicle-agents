@@ -25,7 +25,6 @@ from __future__ import annotations
 
 import argparse
 import json
-from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Optional, Sequence
@@ -38,7 +37,6 @@ from bca_beta import analysis
 from bca_beta.agent import Agent
 from bca_beta.calibration import Calibration
 from bca_beta.engine import build_initial_means, run_round_robin
-from bca_beta.llm import token_counts
 
 CONCEPT_ID = "transit_priority"
 A_PLUS = "Aldenvale should expand its rail-transit network"
@@ -269,6 +267,7 @@ def run_tier1b_experiment(
     max_workers: int = 1,
     cache: Optional[Any] = None,
     gamma: float = 1.0,
+    provenance: Optional[dict] = None,
 ) -> dict:
     """Run the full kappa x seed sweep, analyse it, and write all outputs.
 
@@ -319,6 +318,8 @@ def run_tier1b_experiment(
         events_df, utterances_df, summary_df, deviation_by_kappa, model, appraiser_model,
         min_denominator=min_denominator,
     )
+    if provenance is not None:
+        metrics["provenance"] = provenance
 
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -372,7 +373,10 @@ def _print_metrics(metrics: dict) -> None:
 def main(argv: Optional[Sequence[str]] = None) -> int:
     """CLI entry point for the LLM-network experiment."""
     parser = argparse.ArgumentParser(description="BCA LLM-network experiment")
-    parser.add_argument("--model", default=DEFAULT_MODEL, help="generator model")
+    parser.add_argument("--model-key", default=None,
+                        help="registry model key (e.g. gpt-5.4, llama4-scout); "
+                             "overrides --model and selects the endpoint")
+    parser.add_argument("--model", default=DEFAULT_MODEL, help="raw generator model id (legacy)")
     parser.add_argument("--appraiser-model", default=None, help="appraiser model (defaults to --model)")
     parser.add_argument("--n-agents", type=int, default=20)
     parser.add_argument("--n-rounds", type=int, default=10, help="pilot default 10; full 20")
@@ -411,31 +415,44 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         return 0
 
     # Build the real LLM-backed generator/appraiser only for a live run.
-    from bca_beta.appraisers import OpenAIStanceAppraiser
-    from bca_beta.generators import OpenAIUtteranceGenerator
-    from bca_beta.llm import JSONCache, OpenAIClient
+    from bca_beta import channel, models
+    from bca_beta.llm import JSONCache
 
-    out_dir = Path(args.out)
+    spec = models.resolve_spec(model_key=args.model_key, model=args.model)
+    appraiser_spec = (
+        models.resolve_spec(model_key=None, model=args.appraiser_model)
+        if args.appraiser_model else spec
+    )
+    out_dir = Path(args.out) if args.out != DEFAULT_OUT else models.default_output_root(spec) / "tier1b"
     out_dir.mkdir(parents=True, exist_ok=True)
     cache = None
     if args.cache or args.resume:
         cache = JSONCache(out_dir / "tier1b_cache.json")
         if args.resume:
             print(f"resume: {len(cache)} cached calls preloaded")
-    calibration = Calibration.load(args.calibration_json) if args.calibration_json else None
 
-    client = OpenAIClient(max_calls=args.max_calls)
-    generator = OpenAIUtteranceGenerator(model=args.model, client=client, cache=cache)
-    appraiser = OpenAIStanceAppraiser(
-        model=appraiser_model, client=client, cache=cache, calibration=calibration
+    # Load the selected model's calibration automatically when not given explicitly.
+    cal_path = args.calibration_json or models.default_calibration_path(spec)
+    if cal_path and Path(cal_path).exists():
+        calibration = Calibration.load(cal_path)
+        print(f"calibration: loaded {cal_path}")
+    else:
+        calibration = None
+        print(f"WARNING: no calibration found for {spec.key} at {cal_path}; "
+              f"running the appraiser UNCALIBRATED", flush=True)
+
+    ch = channel.build_channel(spec, cache=cache, calibration=calibration,
+                               max_calls=args.max_calls, appraiser_spec=appraiser_spec)
+    provenance = channel.provenance_block(
+        spec, appraiser_spec=appraiser_spec, gamma=args.gamma, calibration_path=cal_path,
     )
 
     metrics = run_tier1b_experiment(
-        generator=generator, appraiser=appraiser, kappas=args.kappas,
+        generator=ch.generator, appraiser=ch.appraiser, kappas=args.kappas,
         n_seeds=n_seeds, n_rounds=n_rounds, n_agents=args.n_agents, weight=args.weight,
-        model=args.model, appraiser_model=appraiser_model, out_dir=out_dir,
+        model=spec.model_id, appraiser_model=appraiser_spec.model_id, out_dir=out_dir,
         make_plots=not args.no_plot, min_denominator=args.recovery_min_denominator,
-        max_workers=args.concurrency, cache=cache, gamma=args.gamma,
+        max_workers=args.concurrency, cache=cache, gamma=args.gamma, provenance=provenance,
     )
     if cache is not None:
         cache.save()

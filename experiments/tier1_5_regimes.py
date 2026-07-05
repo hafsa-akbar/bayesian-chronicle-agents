@@ -153,6 +153,7 @@ def run_tier1_5(
     max_workers: int = 1,
     cache: Optional[Any] = None,
     gamma: float = 1.0,
+    provenance: Optional[dict] = None,
 ) -> dict:
     """Run the selected classical regimes through the LLM engine.
 
@@ -442,6 +443,10 @@ def run_tier1_5(
     # ================================================================== #
     pd.DataFrame(all_slider_rows).to_csv(out_dir / "sliders.csv", index=False)
 
+    if provenance is not None:
+        metrics_out["provenance"] = provenance
+        (out_dir / "provenance.json").write_text(json.dumps(provenance, indent=2))
+
     return metrics_out
 
 
@@ -472,7 +477,10 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     parser.add_argument("--n-rounds", type=int, default=10)
     parser.add_argument("--n-seeds", type=int, default=5)
     parser.add_argument("--f-grid", type=float, nargs="+", default=list(DEFAULT_F_GRID))
-    parser.add_argument("--model", default=DEFAULT_MODEL)
+    parser.add_argument("--model-key", default=None,
+                        help="registry model key (e.g. gpt-5.4, llama4-scout); "
+                             "overrides --model and selects the endpoint")
+    parser.add_argument("--model", default=DEFAULT_MODEL, help="raw generator model id (legacy)")
     parser.add_argument("--appraiser-model", default=None)
     parser.add_argument("--calibration-json", type=Path, default=None)
     parser.add_argument("--concurrency", type=int, default=8)
@@ -506,42 +514,53 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         return 0
 
     # Build real LLM-backed objects only for a live run.
-    from bca_beta.appraisers import OpenAIStanceAppraiser
-    from bca_beta.generators import OpenAIUtteranceGenerator
-    from bca_beta.llm import JSONCache, OpenAIClient
-    from bca_beta.probes import OpenAISliderProbe
+    from bca_beta import channel, models
+    from bca_beta.llm import JSONCache
 
-    out_dir = Path(args.out)
+    spec = models.resolve_spec(model_key=args.model_key, model=args.model)
+    appraiser_spec = (
+        models.resolve_spec(model_key=None, model=args.appraiser_model)
+        if args.appraiser_model else spec
+    )
+    out_dir = Path(args.out) if args.out != DEFAULT_OUT else models.default_output_root(spec) / "tier1_5"
     out_dir.mkdir(parents=True, exist_ok=True)
     cache = None
     if args.cache:
         cache = JSONCache(out_dir / "tier1_5_cache.json")
         print(f"cache: {len(cache)} calls preloaded")
-    calibration = Calibration.load(args.calibration_json) if args.calibration_json else None
 
-    client = OpenAIClient()
-    generator = OpenAIUtteranceGenerator(model=args.model, client=client, cache=cache)
-    appraiser = OpenAIStanceAppraiser(
-        model=appraiser_model, client=client, cache=cache, calibration=calibration
+    cal_path = args.calibration_json or models.default_calibration_path(spec)
+    if cal_path and Path(cal_path).exists():
+        calibration = Calibration.load(cal_path)
+        print(f"calibration: loaded {cal_path}")
+    else:
+        calibration = None
+        print(f"WARNING: no calibration found for {spec.key} at {cal_path}; "
+              f"running the appraiser UNCALIBRATED", flush=True)
+
+    ch = channel.build_channel(spec, cache=cache, calibration=calibration,
+                               appraiser_spec=appraiser_spec)
+    provenance = channel.provenance_block(
+        spec, appraiser_spec=appraiser_spec, gamma=args.gamma, calibration_path=cal_path,
     )
-    slider_probe = OpenAISliderProbe(model=args.model, client=client, cache=cache)
 
     metrics = run_tier1_5(
-        generator=generator,
-        appraiser=appraiser,
-        slider_probe=slider_probe,
+        generator=ch.generator,
+        appraiser=ch.appraiser,
+        slider_probe=ch.slider_probe,
         n_agents=args.n_agents,
         n_rounds=args.n_rounds,
         n_seeds=args.n_seeds,
         f_grid=args.f_grid,
-        model=args.model,
-        appraiser_model=appraiser_model,
+        model=spec.model_id,
+        appraiser_model=appraiser_spec.model_id,
         out_dir=out_dir,
         regimes=regimes,
         make_plots=True,
         max_workers=args.concurrency,
         cache=cache,
         gamma=args.gamma,
+        provenance=provenance,
     )
     _print_summary(metrics)
     print(f"wrote regime outputs to {out_dir}")

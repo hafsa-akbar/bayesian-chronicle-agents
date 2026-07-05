@@ -10,6 +10,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Optional, Protocol, runtime_checkable
 
+from bca_beta import params
 from bca_beta.llm import JSONCache, LLMClient
 
 
@@ -72,12 +73,22 @@ class OpenAIUtteranceGenerator:
         model: str,
         client: LLMClient,
         cache: Optional[JSONCache] = None,
-        temperature: float = 0.9,
+        temperature: Optional[float] = None,
+        chat_params: Optional[dict] = None,
     ) -> None:
         self.model = model
         self.client = client
         self.cache = cache
-        self.temperature = temperature
+        # Sampling params come from the centralized policy (bca_beta.params); callers
+        # may pass fully-resolved ``chat_params`` or override just the temperature.
+        if chat_params is not None:
+            self.chat_params = dict(chat_params)
+        else:
+            self.chat_params = params.role_chat_params("generator")
+            if temperature is not None:
+                self.chat_params["temperature"] = temperature
+        # Retained for the cache key (keeps cache stable across endpoint-only extras).
+        self.temperature = self.chat_params.get("temperature")
 
     def build_messages(self, *, belief: float, speaker_id: Any, round_index: int,
                        concept_id: str, a_plus: str, a_minus: str) -> "list[dict]":
@@ -122,7 +133,7 @@ class OpenAIUtteranceGenerator:
             if hit is not None:
                 return GenerationResult(text=hit["text"], cached=True, usage=hit.get("usage"))
 
-        result = self.client.chat(self.model, messages, temperature=self.temperature)
+        result = self.client.chat(self.model, messages, **self.chat_params)
         text = result.text.strip()
         if self.cache is not None and key is not None:
             self.cache.set(key, {"text": text, "usage": result.usage})

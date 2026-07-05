@@ -10,6 +10,7 @@ import re
 from dataclasses import dataclass
 from typing import Any, Optional, Protocol, runtime_checkable
 
+from bca_beta import params
 from bca_beta.generators import _stance_descriptor
 from bca_beta.llm import JSONCache, LLMClient
 
@@ -39,11 +40,19 @@ def parse_slider(text: str) -> "tuple[Optional[int], bool]":
 
 class OpenAISliderProbe:
     def __init__(self, model: str, client: LLMClient, cache: Optional[JSONCache] = None,
-                 temperature: float = 0.0) -> None:
+                 temperature: Optional[float] = None,
+                 chat_params: Optional[dict] = None) -> None:
         self.model = model
         self.client = client
         self.cache = cache
-        self.temperature = temperature
+        # Sampling params from the centralized policy (bca_beta.params).
+        if chat_params is not None:
+            self.chat_params = dict(chat_params)
+        else:
+            self.chat_params = params.role_chat_params("probe")
+            if temperature is not None:
+                self.chat_params["temperature"] = temperature
+        self.temperature = self.chat_params.get("temperature")
 
     def build_messages(self, *, belief, speaker_id, round_index, concept_id, a_plus, a_minus):
         descriptor = _stance_descriptor(belief)
@@ -69,7 +78,7 @@ class OpenAISliderProbe:
             hit = self.cache.get(key)
             if hit is not None:
                 return SliderReading(hit["value"], hit["raw_text"], hit["parse_error"], hit.get("usage"))
-        result = self.client.chat(self.model, messages, temperature=self.temperature)
+        result = self.client.chat(self.model, messages, **self.chat_params)
         value, parse_error = parse_slider(result.text)
         reading = SliderReading(50 if value is None else value, result.text or "",
                                 parse_error, result.usage)

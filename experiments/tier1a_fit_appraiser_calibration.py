@@ -114,7 +114,10 @@ def appraise_labels(df: pd.DataFrame, appraiser: Any) -> pd.DataFrame:
 def main(argv: Optional[Sequence[str]] = None) -> int:
     """CLI entry point: appraise the labels, fit tau, evaluate, and save."""
     parser = argparse.ArgumentParser(description="BCA appraiser temperature calibration")
-    parser.add_argument("--model", default=DEFAULT_MODEL, help="appraiser model")
+    parser.add_argument("--model-key", default=None,
+                        help="registry model key (e.g. gpt-5.4, llama4-scout); "
+                             "overrides --model and selects the endpoint")
+    parser.add_argument("--model", default=DEFAULT_MODEL, help="raw appraiser model id (legacy)")
     parser.add_argument("--labels", type=Path, default=DEFAULT_LABELS)
     parser.add_argument("--mode", choices=("raw_prob", "logit_diff"), default="raw_prob")
     parser.add_argument("--out", type=Path, default=DEFAULT_OUT)
@@ -136,15 +139,17 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             print(f"  approx cost(USD): {approx_tokens / 1e6 * args.price_per_1m_tokens:.2f}")
         return 0
 
-    from bca_beta.appraisers import OpenAIStanceAppraiser
-    from bca_beta.llm import JSONCache, OpenAIClient
+    from bca_beta import channel, models
+    from bca_beta.llm import JSONCache
 
-    out_dir = Path(args.out)
+    spec = models.resolve_spec(model_key=args.model_key, model=args.model)
+    out_dir = Path(args.out) if args.out != DEFAULT_OUT else models.default_output_root(spec) / "tier1a"
     out_dir.mkdir(parents=True, exist_ok=True)
     cache = JSONCache(out_dir / "tier1a_cache.json") if args.cache else None
-    client = OpenAIClient(max_calls=args.max_calls)
-    # Fit on the *raw* appraiser output, so no calibration is applied here.
-    appraiser = OpenAIStanceAppraiser(model=args.model, client=client, cache=cache, calibration=None)
+    # Fit on the *raw* appraiser output, so no calibration is applied here. The channel
+    # points the appraiser at the selected model's endpoint with the centralized params.
+    ch = channel.build_channel(spec, cache=cache, calibration=None, max_calls=args.max_calls)
+    appraiser = ch.appraiser
 
     raw_df = appraise_labels(labels, appraiser)
     if cache is not None:
@@ -152,7 +157,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     raw_df.to_csv(out_dir / "appraiser_calibration_raw_outputs.csv", index=False)
 
     calibration, metrics, val_pred = fit_and_evaluate(raw_df, mode=args.mode)
-    metrics["model"] = args.model
+    metrics["model"] = spec.model_id
+    metrics["provenance"] = channel.provenance_block(spec)
     if "total_tokens" in raw_df.columns:
         metrics["token_usage"] = {
             "total_tokens": int(raw_df["total_tokens"].sum()),
@@ -162,15 +168,21 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         }
 
     calibration.save(out_dir / "appraiser_calibration_tau.json")
+    # Canonical per-model calibration file, auto-loaded by downstream runs.
+    canonical = models.default_calibration_path(spec)
+    canonical.parent.mkdir(parents=True, exist_ok=True)
+    calibration.save(canonical)
     (out_dir / "appraiser_calibration_metrics.json").write_text(json.dumps(metrics, indent=2))
     val_pred.to_csv(out_dir / "appraiser_validation_predictions.csv", index=False)
 
     v = metrics["validation"]
+    print(f"model = {spec.key} ({spec.model_id}) @ {spec.endpoint_label}")
     print(f"fitted tau = {calibration.tau:.4f} (mode={args.mode})")
     print(f"validation NLL   raw={v['raw']['nll']:.4f}  calibrated={v['calibrated']['nll']:.4f}")
     print(f"validation ECE   raw={v['raw']['ece']:.4f}  calibrated={v['calibrated']['ece']:.4f}")
     print(f"validation MAE   raw={v['raw']['mae']:.4f}  calibrated={v['calibrated']['mae']:.4f}")
     print(f"wrote calibration outputs to {out_dir}")
+    print(f"canonical per-model calibration -> {canonical}")
     return 0
 
 

@@ -44,8 +44,8 @@ def token_counts(usage: Optional[dict]) -> dict:
 class LLMClient(Protocol):
     """Anything that can turn chat messages into a :class:`ChatResult`."""
 
-    def chat(self, model: str, messages: "list[Message]", *, temperature: float = 0.0,
-             **kwargs: Any) -> ChatResult:
+    def chat(self, model: str, messages: "list[Message]", *,
+             temperature: Optional[float] = 0.0, **kwargs: Any) -> ChatResult:
         ...
 
 
@@ -62,15 +62,29 @@ class OpenAIClient:
         api_key_env: str = "OPENAI_API_KEY",
         env_path: Optional["str | Path"] = None,
         max_calls: Optional[int] = None,
+        base_url: Optional[str] = None,
     ) -> None:
         self._api_key_env = api_key_env
         self._env_path = env_path
         self.max_calls = max_calls
+        self.base_url = base_url  # None = default OpenAI endpoint
         self.n_calls = 0
         self._client = None  # constructed lazily
 
+    @classmethod
+    def from_spec(cls, spec: Any, max_calls: Optional[int] = None,
+                  env_path: Optional["str | Path"] = None) -> "OpenAIClient":
+        """Build a client for a :class:`~bca_beta.models.ModelSpec`'s endpoint.
+
+        Reads the key from the env var named on the spec (never hardcodes
+        ``OPENAI_API_KEY``) and points at the spec's ``base_url`` (``None`` = OpenAI).
+        """
+        return cls(api_key_env=spec.api_key_env, base_url=spec.base_url,
+                   max_calls=max_calls, env_path=env_path)
+
     def __repr__(self) -> str:  # never leak the key
-        return f"OpenAIClient(n_calls={self.n_calls}, max_calls={self.max_calls})"
+        return (f"OpenAIClient(endpoint={self.base_url or 'openai-default'}, "
+                f"n_calls={self.n_calls}, max_calls={self.max_calls})")
 
     def _ensure_client(self):
         if self._client is not None:
@@ -92,16 +106,23 @@ class OpenAIClient:
             )
         from openai import OpenAI
 
-        self._client = OpenAI(api_key=key)
+        if self.base_url:
+            self._client = OpenAI(api_key=key, base_url=self.base_url)
+        else:
+            self._client = OpenAI(api_key=key)
         return self._client
 
-    def chat(self, model: str, messages: "list[Message]", *, temperature: float = 0.0,
-             **kwargs: Any) -> ChatResult:
+    def chat(self, model: str, messages: "list[Message]", *,
+             temperature: Optional[float] = 0.0, **kwargs: Any) -> ChatResult:
         if self.max_calls is not None and self.n_calls >= self.max_calls:
             raise RuntimeError(f"max_calls ({self.max_calls}) exceeded")
         client = self._ensure_client()
+        # A ``None`` temperature means "do not send this sampling param" (for endpoints
+        # that reject it); everything else is forwarded verbatim (e.g. extra_body).
+        if temperature is not None:
+            kwargs = {"temperature": temperature, **kwargs}
         response = client.chat.completions.create(
-            model=model, messages=messages, temperature=temperature, **kwargs
+            model=model, messages=messages, **kwargs
         )
         self.n_calls += 1
         text = response.choices[0].message.content or ""

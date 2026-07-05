@@ -42,23 +42,25 @@ Opinion Dynamics* paper for the FJ model (`x(t+1) = A W x(t) + (I−A) x(0)`; di
 `A` = susceptibility, `I−A` = stubbornness) and the *BCA redesign* document (§2.4 "The
 update", §2.5 "Why κ behaves like Friedkin–Johnsen stubbornness", proofs in §6–§8).
 
-All runs use one concept (`transit_priority`: "expand rail" vs "keep roads"), `N = 20`
-agents on a complete graph, and `gpt-5.4-mini` as generator and appraiser. The OpenAI key
-is read from `.env` (via `python-dotenv`, never logged); models are configurable with
-`--model` / `--appraiser-model`.
+All runs use one concept (`transit_priority`: "expand rail" vs "keep roads") and `N = 20`
+agents on a complete graph. The model is selected per run with `--model-key` (registry in
+`models.py`; see [Running on multiple models](#running-on-multiple-models)) — the same
+experiments run unchanged on `gpt-5.4-mini`, `gpt-5.4`, and `llama4-scout`. API keys are
+read from `.env` (via `python-dotenv`, never logged).
 
 ## Appraiser calibration
 
 `experiments/tier1a_fit_appraiser_calibration.py` runs the appraiser on 100 soft-labelled
 utterances (`tier1a_appraiser_labels.csv`), fits one temperature τ on the 80-example
 calibration split by minimising soft-label BCE, and evaluates on the 20-example validation
-split. A live run fitted **τ = 1.89** (the appraiser is overconfident), improving
-validation ECE 0.100 → 0.052 and NLL 0.568 → 0.493. The fit is saved to
-`experiments/calibration/appraiser_calibration_tau.json` and reused by every downstream
-run; it is independent of κ and γ.
+split. τ is model-specific (live fits: **1.89** for `gpt-5.4-mini`, **2.15** for
+`gpt-5.4`, **1.51** for `llama4-scout`; all overconfident) — for `gpt-5.4-mini` it
+improves validation ECE 0.100 → 0.052 and NLL 0.568 → 0.493. Each fit is saved to
+`experiments/calibration/<model_key>_tau.json` and auto-loaded by every downstream run
+of that model; it is independent of κ and γ.
 
 ```bash
-python -m bca_beta.experiments.tier1a_fit_appraiser_calibration --model gpt-5.4-mini --cache
+python -m bca_beta.experiments.tier1a_fit_appraiser_calibration --model-key gpt-5.4-mini --cache
 ```
 
 ## The LLM language channel and κ recovery
@@ -79,20 +81,20 @@ all listeners. The κ-recovery inversion is γ-aware (it uses the saturating cou
 `n_c = κ + w(1−γ^c)/(1−γ)`, reducing to `w(1/η−(c+1))` at γ = 1).
 
 ```bash
-python -m bca_beta.experiments.tier1b_llm_network --model gpt-5.4-mini --gamma 0.7 \
-  --calibration-json bca_beta/experiments/calibration/appraiser_calibration_tau.json --cache
+python -m bca_beta.experiments.tier1b_llm_network --model-key gpt-5.4-mini --gamma 0.7 --cache
 # cost controls: --dry-run, --max-calls, --cache, --resume, --price-per-1m-tokens
 ```
 
-At γ = 0.7 the appraiser tracks the latent belief faithfully (Pearson ≈ 0.96) and κ is
-recovered oracle-aligned with Spearman ≈ 0.96 / relative error ≈ 0.6, with ≈ 77% of events
-well-conditioned (vs ≈ 12% at γ = 1, where the population converges). Per-event κ estimates
+At γ = 0.7 (5 seeds × 20 rounds) the appraiser tracks the latent belief faithfully
+(Pearson ≈ 0.96) and κ is recovered oracle-aligned with Spearman ≈ 0.96 / relative error
+≈ 0.28, with ≈ 76% of events well-conditioned (vs ≈ 12% at γ = 1, where the population
+converges). Per-event κ estimates
 are heavy-tailed (inverting η amplifies appraiser error when listener ≈ speaker), so the
 headline uses the per-condition median; `tier1b_metrics.json` keeps the full transparency
 set (`condition_median_recovery`, `per_event_mae`, `n_skipped_near_zero_denominator`,
 trajectory deviation, alignment MAE) and the real API token usage from `response.usage`.
 
-Outputs (`experiments/outputs/tier1b/`): `tier1b_events.csv`, `tier1b_utterances.csv`,
+Outputs (`experiments/outputs/<model_key>/tier1b/`): `tier1b_events.csv`, `tier1b_utterances.csv`,
 `tier1b_metrics.json`, `tier1b_kappa_summary.csv`, `tier1b_alignment_by_bin.csv`, and
 `plot_appraised_vs_speaker_belief.png` / `plot_oracle_aligned_kappa_recovery.png` /
 `plot_trajectory_deviation.png`.
@@ -116,12 +118,12 @@ the shared round-robin loop. A per-round slider probe logs an independent expres
 per agent for the auditability check.
 
 ```bash
-python -m bca_beta.experiments.tier1_5_regimes --regime all --gamma 0.7 --n-seeds 5 --n-rounds 20 \
-  --calibration-json bca_beta/experiments/calibration/appraiser_calibration_tau.json --cache
+python -m bca_beta.experiments.tier1_5_regimes --model-key gpt-5.4-mini --regime all \
+  --gamma 0.7 --n-seeds 5 --n-rounds 20 --cache
 ```
 
-Outputs (`experiments/outputs/tier1_5/`): regime-wise events and metrics; `sliders.csv`
-with per-agent-per-round slider responses.
+Outputs (`experiments/outputs/<model_key>/tier1_5/`): regime-wise events and metrics;
+`sliders.csv` with per-agent-per-round slider responses.
 
 ## Auditability
 
@@ -131,7 +133,8 @@ faithful signal of the belief-update dynamics rather than an artifact of generat
 appraisal (Pearson ≈ 0.99).
 
 ```bash
-python -m bca_beta.experiments.tier2_auditability --sliders bca_beta/experiments/outputs/tier1_5/sliders.csv
+python -m bca_beta.experiments.tier2_auditability --model-key gpt-5.4-mini \
+  --sliders bca_beta/experiments/outputs/gpt-5.4-mini/tier1_5/sliders.csv --out <dir>
 ```
 
 ## Choosing γ — the forgetting-factor sweep
@@ -162,19 +165,84 @@ bca_beta/
   engine.py        shared round-robin event loop + initial-belief helper
   analysis.py      γ-aware κ/η recovery, alignment, trajectory, regime + slider metrics, plots
   classical.py     closed-form DeGroot / FJ / committed-minority (Prop 3) references
+  models.py        model registry: KEY → {model_id, base_url, api_key_env, extra_body}
+  params.py        centralized sampling policy (role → temperature), identical per model
+  channel.py       one wiring path: ModelSpec → (client, generator, appraiser, probe)
   experiments/
     tier1a_fit_appraiser_calibration.py  fit the appraiser temperature
     tier1b_llm_network.py              LLM-channel κ-recovery experiment
     tier1_5_regimes.py                 classical-regime arc (DeGroot/FJ/committed)
     tier2_auditability.py              belief–expression audit
     gamma_sweep_oracle.py              free (no-API) γ sweep — the γ-selection artifact
-    calibration/appraiser_calibration_tau.json   reusable appraiser fit (τ); runs reuse it
+    calibration/<model_key>_tau.json     per-model appraiser fit (τ); downstream runs auto-load it
   tier1a_appraiser_labels.csv          100 soft-labelled calibration utterances
   tests/           unit tests (all LLM calls mocked — no API in tests)
 ```
 
+## Running on multiple models
+
+All experiments select a model by a short **key** with `--model-key`, resolved through the
+registry in `models.py`:
+
+| key | model_id | endpoint | key env |
+|---|---|---|---|
+| `gpt-5.4-mini` | `gpt-5.4-mini` | default OpenAI | `OPENAI_API_KEY` |
+| `gpt-5.4` | `gpt-5.4` | default OpenAI | `OPENAI_API_KEY` |
+| `llama4-scout` | `meta-llama/Llama-4-Scout-17B-16E-Instruct` | `https://router.huggingface.co/v1` | `HF_API_KEY` |
+
+Adding a model is a single `ModelSpec` entry in `models.REGISTRY`. The sampling params are
+**identical across models** — the generator runs at temperature 0.9 and the appraiser/probe
+at 0.0 for *every* model (centralized in `params.py`); switching the key only changes the
+model id and endpoint. Anything an endpoint requires (e.g. the HF router's `max_tokens`) or
+rejects is carried on the spec and applied identically, with a printed warning if a param
+can't be honored. Each run records the model key, resolved id, endpoint, and exact sampling
+params in its `metrics.json` (`provenance`). The legacy `--model` / `--appraiser-model`
+(raw ids, default OpenAI endpoint) still work when `--model-key` is omitted.
+
+**Per-model calibration.** τ is model-specific, so re-fit Tier 1a per model; it is saved to
+`experiments/calibration/<model_key>_tau.json` and auto-loaded by downstream runs of the
+same key (override with `--calibration-json`).
+
+**Output layout.** With `--model-key` and no explicit `--out`, each experiment writes under a
+per-model root:
+
+```
+experiments/
+  calibration/<model_key>_tau.json          # per-model appraiser calibration
+  outputs/<model_key>/
+    tier1a/                                  # calibration fit artifacts
+    tier1b/    | tier1b_gamma/<γ>/           # κ-recovery (metrics.json carries provenance)
+    tier1_5/   | tier1_5_gamma/<γ>/          # DeGroot / FJ / committed (+ provenance.json)
+    tier2_gamma/<γ>/                         # belief–slider audit
+```
+
+### Running the cross-model comparison
+
+Run the same arc once per key. **Fit calibration first** (each is a paid ~100-call
+run), then the three-regime arc at the operating point γ = 0.7. Every command prints a
+`--dry-run` estimate first — inspect it and only then drop `--dry-run`.
+
+```bash
+CAL=bca_beta/experiments/calibration            # per-model τ lands here automatically
+for KEY in gpt-5.4-mini gpt-5.4 llama4-scout; do
+  # 1) appraiser calibration (per model)  -> $CAL/${KEY}_tau.json
+  python -m bca_beta.experiments.tier1a_fit_appraiser_calibration --model-key $KEY --cache --dry-run
+
+  # 2) three opinion-dynamics regimes at the operating point (auto-loads $CAL/${KEY}_tau.json)
+  python -m bca_beta.experiments.tier1_5_regimes --model-key $KEY --regime all \
+    --gamma 0.7 --n-seeds 5 --n-rounds 20 --concurrency 8 --cache --dry-run
+
+  # 3) (optional) κ-recovery sweep, same model
+  python -m bca_beta.experiments.tier1b_llm_network --model-key $KEY \
+    --gamma 0.7 --kappas 0.5 1 2 4 8 16 32 --n-seeds 5 --n-rounds 20 --concurrency 8 --cache --dry-run
+done
+```
+
+Drop `--dry-run` per command once the estimate is approved. `llama4-scout` reads `HF_API_KEY`
+and routes through the HF OpenAI-compatible endpoint automatically — no other change.
+
 ## Running the tests
 
 ```bash
-python -m pytest bca_beta        # 114 tests, no network access
-``
+python -m pytest bca_beta        # no network access (all LLM calls mocked)
+```
