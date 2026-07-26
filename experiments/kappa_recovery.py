@@ -18,7 +18,7 @@ Efficient event loop (per kappa, seed, round):
   5. for each listener-speaker pair, update the listener with the calibrated evidence.
 
 No OpenAI dependency is required to *use* :func:`simulate_run` /
-:func:`run_tier1b_experiment` -- they accept any generator/appraiser satisfying the
+:func:`run_kappa_recovery_experiment` -- they accept any generator/appraiser satisfying the
 protocols, so the science is unit-tested with deterministic fakes.
 """
 from __future__ import annotations
@@ -43,7 +43,7 @@ A_PLUS = "Aldenvale should expand its rail-transit network"
 A_MINUS = "Aldenvale should keep investing in roads"
 DEFAULT_MODEL = "gpt-5.4-mini"
 DEFAULT_KAPPAS = (0.5, 1.0, 2.0, 4.0, 8.0, 16.0, 32.0)
-DEFAULT_OUT = Path(__file__).resolve().parent / "outputs" / "tier1b"
+DEFAULT_OUT = Path(__file__).resolve().parent / "outputs" / "kappa_recovery"
 
 # Rough per-call token estimates for --dry-run cost projection.
 GEN_TOKENS_PER_CALL = 200
@@ -55,7 +55,7 @@ KAPPA_ORACLE_COL = "kappa_recovered_oracle_aligned"
 
 
 @dataclass
-class Tier1bRunResult:
+class RunResult:
     """One (kappa, seed) run: event log, utterance log, and per-round trajectory."""
 
     events: list[dict]
@@ -83,7 +83,7 @@ def simulate_run(
     graph: Optional[nx.Graph] = None,
     max_workers: int = 1,
     gamma: float = 1.0,
-) -> Tier1bRunResult:
+) -> RunResult:
     """Run one (kappa, seed) round-robin and return its logs.
 
     ``evidence_mode="appraised"`` uses the generator+appraiser channel;
@@ -105,7 +105,7 @@ def simulate_run(
         run_meta={"run_id": run_id, "seed": seed, "model": model,
                   "appraiser_model": appraiser_model, "kappa_condition": kappa},
         evidence_mode=evidence_mode, max_workers=max_workers)
-    return Tier1bRunResult(events=res.events, utterances=res.utterances,
+    return RunResult(events=res.events, utterances=res.utterances,
                            belief_by_round=res.belief_by_round, agent_order=res.agent_order)
 
 
@@ -246,7 +246,7 @@ def _build_metrics(
     }
 
 
-def run_tier1b_experiment(
+def run_kappa_recovery_experiment(
     *,
     generator: Any,
     appraiser: Any,
@@ -323,11 +323,14 @@ def run_tier1b_experiment(
 
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
-    events_df.to_csv(out_dir / "tier1b_events.csv", index=False)
-    utterances_df.to_csv(out_dir / "tier1b_utterances.csv", index=False)
-    summary_df.to_csv(out_dir / "tier1b_kappa_summary.csv", index=False)
-    alignment_bins.to_csv(out_dir / "tier1b_alignment_by_bin.csv", index=False)
-    (out_dir / "tier1b_metrics.json").write_text(json.dumps(metrics, indent=2))
+    events_df.to_csv(out_dir / "events.csv", index=False)
+    utterances_df.to_csv(out_dir / "utterances.csv", index=False)
+    # Quick-look summary from the gamma=1 count shortcut; exact only at gamma=1.
+    # The paper's canonical recovery inverts the full identity from events.csv:
+    # experiments/exact_kappa_reanalysis.py -> exact_kappa_summary.csv.
+    summary_df.to_csv(out_dir / "kappa_summary.csv", index=False)
+    alignment_bins.to_csv(out_dir / "alignment_by_bin.csv", index=False)
+    (out_dir / "metrics.json").write_text(json.dumps(metrics, indent=2))
 
     if make_plots:
         import matplotlib
@@ -423,11 +426,11 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         models.resolve_spec(model_key=None, model=args.appraiser_model)
         if args.appraiser_model else spec
     )
-    out_dir = Path(args.out) if args.out != DEFAULT_OUT else models.default_output_root(spec) / "tier1b"
+    out_dir = Path(args.out) if args.out != DEFAULT_OUT else models.default_output_root(spec) / "kappa_recovery" / f"{args.gamma:.1f}"
     out_dir.mkdir(parents=True, exist_ok=True)
     cache = None
     if args.cache or args.resume:
-        cache = JSONCache(out_dir / "tier1b_cache.json")
+        cache = JSONCache(out_dir / "cache.json")
         if args.resume:
             print(f"resume: {len(cache)} cached calls preloaded")
 
@@ -447,7 +450,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         spec, appraiser_spec=appraiser_spec, gamma=args.gamma, calibration_path=cal_path,
     )
 
-    metrics = run_tier1b_experiment(
+    metrics = run_kappa_recovery_experiment(
         generator=ch.generator, appraiser=ch.appraiser, kappas=args.kappas,
         n_seeds=n_seeds, n_rounds=n_rounds, n_agents=args.n_agents, weight=args.weight,
         model=spec.model_id, appraiser_model=appraiser_spec.model_id, out_dir=out_dir,

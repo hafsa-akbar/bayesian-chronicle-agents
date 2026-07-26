@@ -1,0 +1,107 @@
+{
+  "model": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+  "appraiser_model": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+  "n_events": 266000,
+  "n_utterances": 14000,
+  "n_parse_errors": 0,
+  "token_usage": {
+    "generator_total_tokens": 3270705,
+    "generator_prompt_tokens": 2504104,
+    "generator_completion_tokens": 766601,
+    "appraiser_total_tokens": 3013847,
+    "appraiser_prompt_tokens": 2502601,
+    "appraiser_completion_tokens": 511246,
+    "total_tokens": 6284552
+  },
+  "alignment": {
+    "mae": 0.07960542946812094,
+    "rmse": 0.10784613771687496,
+    "pearson": 0.9379318543121327,
+    "spearman": 0.944657337727676,
+    "n": 14000
+  },
+  "oracle_aligned_kappa": {
+    "min_denominator": 0.05,
+    "aggregation": "per-condition median of per-event estimates, well-conditioned events",
+    "mae": 2.2542584398332566,
+    "relative_error": 0.5232360960010831,
+    "pearson": 0.9992683420753662,
+    "spearman": 1.0,
+    "kept_fraction": 0.7656729323308271,
+    "condition_median_recovery": {
+      "0.5": -0.43413268468899613,
+      "1.0": 0.35196229478995544,
+      "2.0": 1.7178858198321656,
+      "4.0": 5.124274536487754,
+      "8.0": 10.335515074982712,
+      "16.0": 19.377368745611758,
+      "32.0": 39.078366151683696
+    },
+    "per_event_mae": 2724725962493.864,
+    "n_skipped_near_zero_denominator": 0,
+    "all_events": {
+      "kept_fraction": 1.0,
+      "mae": 1.5941841806486006,
+      "relative_error": 0.47680375410087456,
+      "pearson": 0.9995665199261727,
+      "spearman": 0.9642857142857145,
+      "per_event_mae": 4165799486103.9775,
+      "condition_median_recovery": {
+        "0.5": -0.09505047455648441,
+        "1.0": -0.12192194369720433,
+        "2.0": 0.8626196711306648,
+        "4.0": 4.121087106588626,
+        "8.0": 9.14723105801286,
+        "16.0": 18.026983649184857,
+        "32.0": 37.00963470363084
+      }
+    }
+  },
+  "oracle_aligned_eta": {
+    "mae": 0.821394259916502
+  },
+  "mechanical": {
+    "eta_mae": 0.5062069267825192
+  },
+  "trajectory": {
+    "final_mean_abs_dev_by_kappa": {
+      "0.5": 0.43605745637429927,
+      "1.0": 0.3814785701784896,
+      "2.0": 0.06233292675477577,
+      "4.0": 0.032216588476112126,
+      "8.0": 0.021860549183275995,
+      "16.0": 0.011398707863432273,
+      "32.0": 0.005805330047698285
+    },
+    "overall_mean_abs_dev": 0.0983673947452688
+  },
+  "provenance": {
+    "model_key": "llama4-scout",
+    "generator_model_id": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+    "appraiser_model_id": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+    "endpoint": "https://router.huggingface.co/v1",
+    "api_key_env": "HF_API_KEY",
+    "sampling": {
+      "generator": {
+        "temperature": 0.9,
+        "extra_body": {
+          "max_tokens": 512
+        }
+      },
+      "appraiser": {
+        "temperature": 0.0,
+        "extra_body": {
+          "max_tokens": 512
+        }
+      },
+      "probe": {
+        "temperature": 0.0,
+        "extra_body": {
+          "max_tokens": 512
+        }
+      }
+    },
+    "gamma": 0.7,
+    "calibration_json": "/Users/hafsaakbar/Desktop/bca/bca_beta/experiments/calibration/llama4-scout_tau.json"
+  }
+}

@@ -1,0 +1,98 @@
+{
+  "model": "claude-sonnet-4-6",
+  "appraiser_model": "claude-sonnet-4-6",
+  "n_events": 266000,
+  "n_utterances": 14000,
+  "n_parse_errors": 0,
+  "token_usage": {
+    "generator_total_tokens": 3360210,
+    "generator_prompt_tokens": 2590443,
+    "generator_completion_tokens": 769767,
+    "appraiser_total_tokens": 3189522,
+    "appraiser_prompt_tokens": 2547767,
+    "appraiser_completion_tokens": 641755,
+    "total_tokens": 6549732
+  },
+  "alignment": {
+    "mae": 0.07004784424181118,
+    "rmse": 0.08707396670707064,
+    "pearson": 0.9559519316252265,
+    "spearman": 0.939945481837887,
+    "n": 14000
+  },
+  "oracle_aligned_kappa": {
+    "min_denominator": 0.05,
+    "aggregation": "per-condition median of per-event estimates, well-conditioned events",
+    "mae": 2.390046012686756,
+    "relative_error": 1.2952510058077473,
+    "pearson": 0.9949065219138693,
+    "spearman": 0.8571428571428573,
+    "kept_fraction": 0.7571052631578947,
+    "condition_median_recovery": {
+      "0.5": 3.7293804306685314,
+      "1.0": 2.895837166384094,
+      "2.0": 1.832385758414648,
+      "4.0": 4.121529023154118,
+      "8.0": 9.676423749056177,
+      "16.0": 18.78979588907618,
+      "32.0": 38.849741588882836
+    },
+    "per_event_mae": 40.163645086020786,
+    "n_skipped_near_zero_denominator": 0,
+    "all_events": {
+      "kept_fraction": 1.0,
+      "mae": 1.5055349994710772,
+      "relative_error": 0.7184104868079257,
+      "pearson": 0.9966111708063784,
+      "spearman": 0.8571428571428573,
+      "per_event_mae": 35.42661036514103,
+      "condition_median_recovery": {
+        "0.5": 2.4446776686962117,
+        "1.0": 1.2158480742732545,
+        "2.0": 1.1175988945591806,
+        "4.0": 3.3430190764429,
+        "8.0": 8.6257372468802,
+        "16.0": 17.467125831192998,
+        "32.0": 36.745974146256955
+      }
+    }
+  },
+  "oracle_aligned_eta": {
+    "mae": 1.1999776873328194
+  },
+  "mechanical": {
+    "eta_mae": 0.4577032074281032
+  },
+  "trajectory": {
+    "final_mean_abs_dev_by_kappa": {
+      "0.5": 0.315963131647754,
+      "1.0": 0.23113493591172637,
+      "2.0": 0.13052225851645244,
+      "4.0": 0.04227780916648919,
+      "8.0": 0.019810190090907186,
+      "16.0": 0.006455416012468321,
+      "32.0": 0.0033347218130443494
+    },
+    "overall_mean_abs_dev": 0.08874853651077354
+  },
+  "provenance": {
+    "model_key": "claude-sonnet-4-6",
+    "generator_model_id": "claude-sonnet-4-6",
+    "appraiser_model_id": "claude-sonnet-4-6",
+    "endpoint": "https://api.anthropic.com/v1/",
+    "api_key_env": "ANTHROPIC_API_KEY",
+    "sampling": {
+      "generator": {
+        "temperature": 0.9
+      },
+      "appraiser": {
+        "temperature": 0.0
+      },
+      "probe": {
+        "temperature": 0.0
+      }
+    },
+    "gamma": 0.7,
+    "calibration_json": "/Users/hafsaakbar/Desktop/bca/bca_beta/experiments/calibration/claude-sonnet-4-6_tau.json"
+  }
+}

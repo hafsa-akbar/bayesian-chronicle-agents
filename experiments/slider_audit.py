@@ -8,7 +8,7 @@ import pandas as pd
 from bca_beta import analysis
 
 
-def run_tier2(sliders_csv: str | Path, out_dir: str | Path, make_plots: bool = True,
+def run_slider_audit(sliders_csv: str | Path, out_dir: str | Path, make_plots: bool = True,
               provenance: dict | None = None) -> dict:
     """
     Read a combined slider log and compute belief↔slider correlation metrics.
@@ -82,7 +82,7 @@ def main(argv: list[str] | None = None) -> int:
         spec = models.get_model_spec(args.model_key)
         provenance = {"model_key": spec.key, "model_id": spec.model_id,
                       "endpoint": spec.endpoint_label}
-    run_tier2(args.sliders, args.out, make_plots=not args.no_plot, provenance=provenance)
+    run_slider_audit(args.sliders, args.out, make_plots=not args.no_plot, provenance=provenance)
     return 0
 
 

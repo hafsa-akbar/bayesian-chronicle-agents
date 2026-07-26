@@ -65,6 +65,14 @@ REGISTRY: "dict[str, ModelSpec]" = {
         # The HF router wants an explicit token cap; applied identically to every role.
         extra_body={"max_tokens": 512},
     ),
+    "claude-sonnet-4-6": ModelSpec(
+        key="claude-sonnet-4-6",
+        model_id="claude-sonnet-4-6",
+        api_key_env="ANTHROPIC_API_KEY",
+        # Anthropic's OpenAI-SDK compatibility endpoint; honors the shared sampling
+        # params, so no unsupported_params/extra_body entry is needed.
+        base_url="https://api.anthropic.com/v1/",
+    ),
 }
 
 

@@ -46,11 +46,13 @@ def _discounted_evidence_count(c: np.ndarray, weight: np.ndarray, gamma: np.ndar
 
 def _kappa_from_eta(eta: np.ndarray, c: np.ndarray, weight: np.ndarray,
                     gamma: np.ndarray) -> np.ndarray:
-    """Invert the live susceptibility to the prior strength, gamma-aware.
+    """Invert the live susceptibility to the prior strength.
 
     ``eta = w / (n + w)`` so ``n = w/eta - w``; the prior strength is
     ``kappa = n - (n_c - kappa)`` with the discounted count above. At ``gamma = 1`` this
-    reduces to ``kappa = w (1/eta - (c + 1))``.
+    reduces to ``kappa = w (1/eta - (c + 1))`` and is exact; at ``gamma < 1`` it ignores
+    the anchor term of the exact one-step identity and is biased -- use
+    ``experiments/exact_kappa_reanalysis.py`` for the canonical recovery.
     """
     with np.errstate(divide="ignore", invalid="ignore"):
         n = weight / eta - weight

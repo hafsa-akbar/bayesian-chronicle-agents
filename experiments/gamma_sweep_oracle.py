@@ -34,7 +34,7 @@ import pandas as pd
 
 from bca_beta import analysis
 from bca_beta.engine import run_round_robin
-from bca_beta.experiments.tier1_5_regimes import (
+from bca_beta.experiments.classical_regimes import (
     A_MINUS,
     A_PLUS,
     CONCEPT_ID,

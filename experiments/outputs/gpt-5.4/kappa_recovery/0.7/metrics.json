@@ -1,0 +1,98 @@
+{
+  "model": "gpt-5.4",
+  "appraiser_model": "gpt-5.4",
+  "n_events": 266000,
+  "n_utterances": 14000,
+  "n_parse_errors": 0,
+  "token_usage": {
+    "generator_total_tokens": 3247039,
+    "generator_prompt_tokens": 2450990,
+    "generator_completion_tokens": 796049,
+    "appraiser_total_tokens": 2983361,
+    "appraiser_prompt_tokens": 2434049,
+    "appraiser_completion_tokens": 549312,
+    "total_tokens": 6230400
+  },
+  "alignment": {
+    "mae": 0.08407376486438901,
+    "rmse": 0.0994964992323882,
+    "pearson": 0.9662603490805487,
+    "spearman": 0.9743706063647054,
+    "n": 14000
+  },
+  "oracle_aligned_kappa": {
+    "min_denominator": 0.05,
+    "aggregation": "per-condition median of per-event estimates, well-conditioned events",
+    "mae": 0.9375869005523249,
+    "relative_error": 0.45339040541157416,
+    "pearson": 0.9988276856521852,
+    "spearman": 0.9642857142857145,
+    "kept_fraction": 0.7632368421052631,
+    "condition_median_recovery": {
+      "0.5": -0.4742767340848477,
+      "1.0": 1.0909826974234103,
+      "2.0": 0.8124294536680323,
+      "4.0": 2.5315169036602105,
+      "8.0": 7.145090148203318,
+      "16.0": 15.861224783892867,
+      "32.0": 33.848110161782444
+    },
+    "per_event_mae": 183147795755.0654,
+    "n_skipped_near_zero_denominator": 0,
+    "all_events": {
+      "kept_fraction": 1.0,
+      "mae": 1.2484052924654454,
+      "relative_error": 0.6218515849576394,
+      "pearson": 0.9989329623479303,
+      "spearman": 1.0,
+      "per_event_mae": 289019985258.9489,
+      "condition_median_recovery": {
+        "0.5": -0.3564669562426799,
+        "1.0": 0.08141380326166292,
+        "2.0": 0.20215888188930364,
+        "4.0": 1.891703155338122,
+        "8.0": 6.302706164021851,
+        "16.0": 14.695248551152215,
+        "32.0": 31.94439935332141
+      }
+    }
+  },
+  "oracle_aligned_eta": {
+    "mae": 0.783496344184528
+  },
+  "mechanical": {
+    "eta_mae": 0.512038031502737
+  },
+  "trajectory": {
+    "final_mean_abs_dev_by_kappa": {
+      "0.5": 0.34512535531844973,
+      "1.0": 0.24846392238944603,
+      "2.0": 0.16590493918246824,
+      "4.0": 0.027601060519133885,
+      "8.0": 0.013341803867465838,
+      "16.0": 0.006862193352572689,
+      "32.0": 0.0031070247245781842
+    },
+    "overall_mean_abs_dev": 0.07355321036700393
+  },
+  "provenance": {
+    "model_key": "gpt-5.4",
+    "generator_model_id": "gpt-5.4",
+    "appraiser_model_id": "gpt-5.4",
+    "endpoint": "openai-default",
+    "api_key_env": "OPENAI_API_KEY",
+    "sampling": {
+      "generator": {
+        "temperature": 0.9
+      },
+      "appraiser": {
+        "temperature": 0.0
+      },
+      "probe": {
+        "temperature": 0.0
+      }
+    },
+    "gamma": 0.7,
+    "calibration_json": "/Users/hafsaakbar/Desktop/bca/bca_beta/experiments/calibration/gpt-5.4_tau.json"
+  }
+}

@@ -26,7 +26,7 @@ A_PLUS = "Aldenvale should expand its rail-transit network"
 A_MINUS = "Aldenvale should keep investing in roads"
 DEFAULT_MODEL = "gpt-5.4-mini"
 DEFAULT_F_GRID = (0.05, 0.10, 0.15, 0.20, 0.25, 0.30, 0.40)
-DEFAULT_OUT = Path(__file__).resolve().parent / "outputs" / "tier1_5"
+DEFAULT_OUT = Path(__file__).resolve().parent / "outputs" / "classical_regimes"
 
 WEIGHT = 1.0
 
@@ -136,7 +136,7 @@ def estimate_calls(
     }
 
 
-def run_tier1_5(
+def run_classical_regimes(
     *,
     generator: Any,
     appraiser: Any,
@@ -522,11 +522,11 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         models.resolve_spec(model_key=None, model=args.appraiser_model)
         if args.appraiser_model else spec
     )
-    out_dir = Path(args.out) if args.out != DEFAULT_OUT else models.default_output_root(spec) / "tier1_5"
+    out_dir = Path(args.out) if args.out != DEFAULT_OUT else models.default_output_root(spec) / "classical_regimes" / f"{args.gamma:.1f}"
     out_dir.mkdir(parents=True, exist_ok=True)
     cache = None
     if args.cache:
-        cache = JSONCache(out_dir / "tier1_5_cache.json")
+        cache = JSONCache(out_dir / "cache.json")
         print(f"cache: {len(cache)} calls preloaded")
 
     cal_path = args.calibration_json or models.default_calibration_path(spec)
@@ -544,7 +544,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         spec, appraiser_spec=appraiser_spec, gamma=args.gamma, calibration_path=cal_path,
     )
 
-    metrics = run_tier1_5(
+    metrics = run_classical_regimes(
         generator=ch.generator,
         appraiser=ch.appraiser,
         slider_probe=ch.slider_probe,

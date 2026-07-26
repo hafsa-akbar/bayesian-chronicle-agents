@@ -1,0 +1,71 @@
+{
+  "mode": "raw_prob",
+  "tau": 2.145293767322013,
+  "n_calibration": 80,
+  "n_validation": 20,
+  "validation": {
+    "raw": {
+      "mae": 0.10599999999999996,
+      "rmse": 0.13546217184144066,
+      "brier": 0.018349999999999998,
+      "nll": 0.6041602753330535,
+      "ece": 0.10300000000000008,
+      "pearson": 0.968001926653542,
+      "spearman": 0.9839871236603859
+    },
+    "calibrated": {
+      "mae": 0.059435111565586785,
+      "rmse": 0.0784040246346276,
+      "brier": 0.006147191078907293,
+      "nll": 0.49045416323352686,
+      "ece": 0.0462274017721732,
+      "pearson": 0.9784192049555523,
+      "spearman": 0.9839871236603859
+    }
+  },
+  "calibration_split": {
+    "raw": {
+      "mae": 0.12262500000000001,
+      "rmse": 0.1609386529084918,
+      "brier": 0.025901249999999997,
+      "nll": 0.607599985924461,
+      "ece": 0.11662499999999988,
+      "pearson": 0.9374068750517,
+      "spearman": 0.9660925276241825
+    },
+    "calibrated": {
+      "mae": 0.07928072435409982,
+      "rmse": 0.10018097471278575,
+      "brier": 0.010036227694403817,
+      "nll": 0.4973814511963914,
+      "ece": 0.04512823319108417,
+      "pearson": 0.9575823302509354,
+      "spearman": 0.9660925276241825
+    }
+  },
+  "model": "gpt-5.4",
+  "provenance": {
+    "model_key": "gpt-5.4",
+    "generator_model_id": "gpt-5.4",
+    "appraiser_model_id": "gpt-5.4",
+    "endpoint": "openai-default",
+    "api_key_env": "OPENAI_API_KEY",
+    "sampling": {
+      "generator": {
+        "temperature": 0.9
+      },
+      "appraiser": {
+        "temperature": 0.0
+      },
+      "probe": {
+        "temperature": 0.0
+      }
+    }
+  },
+  "token_usage": {
+    "total_tokens": 17626,
+    "prompt_tokens": 13801,
+    "completion_tokens": 3825,
+    "n_calls": 100
+  }
+}

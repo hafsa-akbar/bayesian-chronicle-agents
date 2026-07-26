@@ -1,0 +1,11 @@
+{
+  "initial_variance": 0.08004474014612563,
+  "final_variance": 8.109894542754959e-05,
+  "persists": false,
+  "r2": -1.118439018075747,
+  "reference_mean": 0.499187270682695,
+  "observed_terminal_mean": 0.5087111472511395,
+  "gamma": 1.0,
+  "stubborn_terminal_var": 0.0001613588894304111,
+  "pliable_terminal_var": 3.429793327120458e-08
+}

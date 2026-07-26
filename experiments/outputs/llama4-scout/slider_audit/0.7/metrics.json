@@ -1,0 +1,33 @@
+{
+  "overall": {
+    "pearson": 0.9797879435921348,
+    "spearman": 0.7866051632822928,
+    "mae": 0.059961317978721104,
+    "n": 18000
+  },
+  "by_regime": {
+    "committed": {
+      "pearson": 0.986171751145505,
+      "spearman": 0.7213181582295591,
+      "mae": 0.05746087591307861,
+      "n": 14000
+    },
+    "degroot": {
+      "pearson": 0.909673477650113,
+      "spearman": 0.708043777137113,
+      "mae": 0.05027696845827187,
+      "n": 2000
+    },
+    "fj": {
+      "pearson": 0.9438262208788102,
+      "spearman": 0.8877766530849281,
+      "mae": 0.08714876195866776,
+      "n": 2000
+    }
+  },
+  "provenance": {
+    "model_key": "llama4-scout",
+    "model_id": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+    "endpoint": "https://router.huggingface.co/v1"
+  }
+}

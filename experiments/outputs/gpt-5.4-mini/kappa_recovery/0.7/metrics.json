@@ -1,0 +1,78 @@
+{
+  "model": "gpt-5.4-mini",
+  "appraiser_model": "gpt-5.4-mini",
+  "n_events": 266000,
+  "n_utterances": 14000,
+  "n_parse_errors": 0,
+  "token_usage": {
+    "generator_total_tokens": 3221561,
+    "generator_prompt_tokens": 2449110,
+    "generator_completion_tokens": 772451,
+    "appraiser_total_tokens": 2889473,
+    "appraiser_prompt_tokens": 2410247,
+    "appraiser_completion_tokens": 479226,
+    "total_tokens": 6111034
+  },
+  "alignment": {
+    "mae": 0.09067452833403764,
+    "rmse": 0.10889458654852012,
+    "pearson": 0.9634710319919324,
+    "spearman": 0.9754104184946706,
+    "n": 14000
+  },
+  "oracle_aligned_kappa": {
+    "min_denominator": 0.05,
+    "aggregation": "per-condition median of per-event estimates, well-conditioned events",
+    "mae": 0.949773904483715,
+    "relative_error": 0.27770005884402876,
+    "pearson": 0.9977689073840541,
+    "spearman": 0.9642857142857145,
+    "kept_fraction": 0.7640639097744361,
+    "condition_median_recovery": {
+      "0.5": 0.3369283821445981,
+      "1.0": 0.8782593438615645,
+      "2.0": 0.5159525566957446,
+      "4.0": 2.098706199436924,
+      "8.0": 6.397415745915004,
+      "16.0": 14.868597431265732,
+      "32.0": 32.24427699070557
+    },
+    "per_event_mae": 2117.934221496161,
+    "n_skipped_near_zero_denominator": 0,
+    "all_events": {
+      "kept_fraction": 1.0,
+      "mae": 1.7752289291306478,
+      "relative_error": 0.6364721167839962,
+      "pearson": 0.9980388788885927,
+      "spearman": 0.8571428571428573,
+      "per_event_mae": 4413.737013478744,
+      "condition_median_recovery": {
+        "0.5": -0.09588202285229208,
+        "1.0": -0.10502844467923378,
+        "2.0": -0.11046443270491935,
+        "4.0": 1.5345411196774683,
+        "8.0": 5.604231403731994,
+        "16.0": 13.755782010685532,
+        "32.0": 30.490217862226917
+      }
+    }
+  },
+  "oracle_aligned_eta": {
+    "mae": 1.0060465458070447
+  },
+  "mechanical": {
+    "eta_mae": 0.7243425023594436
+  },
+  "trajectory": {
+    "final_mean_abs_dev_by_kappa": {
+      "0.5": 0.3420331362557377,
+      "1.0": 0.2651963400405567,
+      "2.0": 0.13227110399910552,
+      "4.0": 0.026421354385151113,
+      "8.0": 0.013363471198518532,
+      "16.0": 0.007300179190110376,
+      "32.0": 0.0037745618012750537
+    },
+    "overall_mean_abs_dev": 0.07314602878902805
+  }
+}

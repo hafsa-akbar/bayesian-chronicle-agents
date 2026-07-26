@@ -1,0 +1,71 @@
+{
+  "mode": "raw_prob",
+  "tau": 1.6867790728916734,
+  "n_calibration": 80,
+  "n_validation": 20,
+  "validation": {
+    "raw": {
+      "mae": 0.089,
+      "rmse": 0.1165332570556577,
+      "brier": 0.013579999999999995,
+      "nll": 0.5330202995053833,
+      "ece": 0.08099999999999996,
+      "pearson": 0.9679330353319906,
+      "spearman": 0.9723286386224286
+    },
+    "calibrated": {
+      "mae": 0.05264608248272902,
+      "rmse": 0.07248861100864555,
+      "brier": 0.005254598725962729,
+      "nll": 0.4866579502315201,
+      "ece": 0.03285188274740125,
+      "pearson": 0.974907983031093,
+      "spearman": 0.9723286386224286
+    }
+  },
+  "calibration_split": {
+    "raw": {
+      "mae": 0.10287499999999998,
+      "rmse": 0.1338889465191208,
+      "brier": 0.017926249999999994,
+      "nll": 0.5404067369013841,
+      "ece": 0.09162499999999993,
+      "pearson": 0.949287181601608,
+      "spearman": 0.9627024237931642
+    },
+    "calibrated": {
+      "mae": 0.07019731475912153,
+      "rmse": 0.08870974420902196,
+      "brier": 0.007869418717630106,
+      "nll": 0.49116008948384804,
+      "ece": 0.022398494893711794,
+      "pearson": 0.9601903313183491,
+      "spearman": 0.9627024237931642
+    }
+  },
+  "model": "claude-sonnet-4-6",
+  "provenance": {
+    "model_key": "claude-sonnet-4-6",
+    "generator_model_id": "claude-sonnet-4-6",
+    "appraiser_model_id": "claude-sonnet-4-6",
+    "endpoint": "https://api.anthropic.com/v1/",
+    "api_key_env": "ANTHROPIC_API_KEY",
+    "sampling": {
+      "generator": {
+        "temperature": 0.9
+      },
+      "appraiser": {
+        "temperature": 0.0
+      },
+      "probe": {
+        "temperature": 0.0
+      }
+    }
+  },
+  "token_usage": {
+    "total_tokens": 19173,
+    "prompt_tokens": 14891,
+    "completion_tokens": 4282,
+    "n_calls": 100
+  }
+}

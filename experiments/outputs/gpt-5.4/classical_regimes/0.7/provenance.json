@@ -1,0 +1,20 @@
+{
+  "model_key": "gpt-5.4",
+  "generator_model_id": "gpt-5.4",
+  "appraiser_model_id": "gpt-5.4",
+  "endpoint": "openai-default",
+  "api_key_env": "OPENAI_API_KEY",
+  "sampling": {
+    "generator": {
+      "temperature": 0.9
+    },
+    "appraiser": {
+      "temperature": 0.0
+    },
+    "probe": {
+      "temperature": 0.0
+    }
+  },
+  "gamma": 0.7,
+  "calibration_json": "/Users/hafsaakbar/Desktop/bca/bca_beta/experiments/calibration/gpt-5.4_tau.json"
+}

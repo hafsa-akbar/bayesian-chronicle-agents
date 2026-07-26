@@ -19,8 +19,8 @@ import pandas as pd
 
 from bca_beta import calibration as cal
 
-DEFAULT_LABELS = Path(__file__).resolve().parents[1] / "tier1a_appraiser_labels.csv"
-DEFAULT_OUT = Path(__file__).resolve().parent / "outputs" / "tier1a"
+DEFAULT_LABELS = Path(__file__).resolve().parents[1] / "appraiser_labels.csv"
+DEFAULT_OUT = Path(__file__).resolve().parent / "outputs" / "appraiser_calibration"
 DEFAULT_MODEL = "gpt-5.4-mini"
 APPR_TOKENS_PER_CALL = 160
 
@@ -143,9 +143,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     from bca_beta.llm import JSONCache
 
     spec = models.resolve_spec(model_key=args.model_key, model=args.model)
-    out_dir = Path(args.out) if args.out != DEFAULT_OUT else models.default_output_root(spec) / "tier1a"
+    out_dir = Path(args.out) if args.out != DEFAULT_OUT else models.default_output_root(spec) / "appraiser_calibration"
     out_dir.mkdir(parents=True, exist_ok=True)
-    cache = JSONCache(out_dir / "tier1a_cache.json") if args.cache else None
+    cache = JSONCache(out_dir / "cache.json") if args.cache else None
     # Fit on the *raw* appraiser output, so no calibration is applied here. The channel
     # points the appraiser at the selected model's endpoint with the centralized params.
     ch = channel.build_channel(spec, cache=cache, calibration=None, max_calls=args.max_calls)

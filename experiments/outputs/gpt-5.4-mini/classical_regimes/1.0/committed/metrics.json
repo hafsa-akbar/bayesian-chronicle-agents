@@ -1,0 +1,46 @@
+{
+  "dose_response": [
+    {
+      "f": 0.05,
+      "converted_fraction": 0.0,
+      "mean_free_belief": 0.15041610730512636,
+      "prop3_reference": 0.08135715810327049
+    },
+    {
+      "f": 0.1,
+      "converted_fraction": 0.0,
+      "mean_free_belief": 0.19281800963142814,
+      "prop3_reference": 0.15648111625970584
+    },
+    {
+      "f": 0.15,
+      "converted_fraction": 0.0,
+      "mean_free_belief": 0.2351210100806899,
+      "prop3_reference": 0.22582045009434673
+    },
+    {
+      "f": 0.2,
+      "converted_fraction": 0.0,
+      "mean_free_belief": 0.35917128052050784,
+      "prop3_reference": 0.28979349944531385
+    },
+    {
+      "f": 0.25,
+      "converted_fraction": 0.0,
+      "mean_free_belief": 0.39875660916025246,
+      "prop3_reference": 0.3487902710008862
+    },
+    {
+      "f": 0.3,
+      "converted_fraction": 1.0,
+      "mean_free_belief": 0.5673117444348442,
+      "prop3_reference": 0.4031742295757736
+    },
+    {
+      "f": 0.4,
+      "converted_fraction": 1.0,
+      "mean_free_belief": 0.7787838054083429,
+      "prop3_reference": 0.4994348737993709
+    }
+  ]
+}

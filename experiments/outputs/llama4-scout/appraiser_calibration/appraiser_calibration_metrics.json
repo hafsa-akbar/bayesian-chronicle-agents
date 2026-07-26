@@ -1,0 +1,80 @@
+{
+  "mode": "raw_prob",
+  "tau": 1.5074805513398346,
+  "n_calibration": 80,
+  "n_validation": 20,
+  "validation": {
+    "raw": {
+      "mae": 0.05000000000000001,
+      "rmse": 0.07745953782588687,
+      "brier": 0.005999980000199999,
+      "nll": 0.5835866709641342,
+      "ece": 0.03999979999999999,
+      "pearson": 0.9766939581579399,
+      "spearman": 0.9751463517074529
+    },
+    "calibrated": {
+      "mae": 0.05775816454606179,
+      "rmse": 0.07695814792447259,
+      "brier": 0.005922556531965005,
+      "nll": 0.5361317213483547,
+      "ece": 0.03438491774032161,
+      "pearson": 0.970629124545539,
+      "spearman": 0.9751463517074529
+    }
+  },
+  "calibration_split": {
+    "raw": {
+      "mae": 0.06413761250000001,
+      "rmse": 0.09181275782897766,
+      "brier": 0.0084295825001625,
+      "nll": 0.5081232908531572,
+      "ece": 0.044637462499999926,
+      "pearson": 0.9651750078497432,
+      "spearman": 0.9680186803013282
+    },
+    "calibrated": {
+      "mae": 0.0586537870605925,
+      "rmse": 0.08391266536291032,
+      "brier": 0.00704133540830777,
+      "nll": 0.49136570359099707,
+      "ece": 0.03503281041804999,
+      "pearson": 0.9650693703729328,
+      "spearman": 0.9680186803013282
+    }
+  },
+  "model": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+  "provenance": {
+    "model_key": "llama4-scout",
+    "generator_model_id": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+    "appraiser_model_id": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+    "endpoint": "https://router.huggingface.co/v1",
+    "api_key_env": "HF_API_KEY",
+    "sampling": {
+      "generator": {
+        "temperature": 0.9,
+        "extra_body": {
+          "max_tokens": 512
+        }
+      },
+      "appraiser": {
+        "temperature": 0.0,
+        "extra_body": {
+          "max_tokens": 512
+        }
+      },
+      "probe": {
+        "temperature": 0.0,
+        "extra_body": {
+          "max_tokens": 512
+        }
+      }
+    }
+  },
+  "token_usage": {
+    "total_tokens": 17847,
+    "prompt_tokens": 14306,
+    "completion_tokens": 3541,
+    "n_calls": 100
+  }
+}

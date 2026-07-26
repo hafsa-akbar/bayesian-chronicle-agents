@@ -1,0 +1,78 @@
+{
+  "model": "gpt-5.4-mini",
+  "appraiser_model": "gpt-5.4-mini",
+  "n_events": 266000,
+  "n_utterances": 14000,
+  "n_parse_errors": 0,
+  "token_usage": {
+    "generator_total_tokens": 3174568,
+    "generator_prompt_tokens": 2437537,
+    "generator_completion_tokens": 737031,
+    "appraiser_total_tokens": 2891232,
+    "appraiser_prompt_tokens": 2375031,
+    "appraiser_completion_tokens": 516201,
+    "total_tokens": 6065800
+  },
+  "alignment": {
+    "mae": 0.020075661648762014,
+    "rmse": 0.04145869473527719,
+    "pearson": 0.9149179025395034,
+    "spearman": 0.45393365273012115,
+    "n": 14000
+  },
+  "oracle_aligned_kappa": {
+    "min_denominator": 0.05,
+    "aggregation": "per-condition median of per-event estimates, well-conditioned events",
+    "mae": 4.646368125610523,
+    "relative_error": 1.4063364316879774,
+    "pearson": 0.9976295150491095,
+    "spearman": 1.0,
+    "kept_fraction": 0.11589097744360902,
+    "condition_median_recovery": {
+      "0.5": -1.6738533199806547,
+      "1.0": -1.3124029476649515,
+      "2.0": -0.5184767118678302,
+      "4.0": 1.3583366413332918,
+      "8.0": 4.192369420620636,
+      "16.0": 9.834152644383913,
+      "32.0": 19.095297393901937
+    },
+    "per_event_mae": 66.42856387353997,
+    "n_skipped_near_zero_denominator": 0,
+    "all_events": {
+      "kept_fraction": 1.0,
+      "mae": 12.816936596475262,
+      "relative_error": 6.144233100871993,
+      "pearson": 0.586064817743023,
+      "spearman": 0.8928571428571429,
+      "per_event_mae": 662.0573207013384,
+      "condition_median_recovery": {
+        "0.5": -0.22753555168982054,
+        "1.0": -30.669856385384065,
+        "2.0": -12.093890195739078,
+        "4.0": 1.0288673387521186,
+        "8.0": 2.6331119841314505,
+        "16.0": 5.317574895791935,
+        "32.0": 7.79317173881061
+      }
+    }
+  },
+  "oracle_aligned_eta": {
+    "mae": 0.09447056888383891
+  },
+  "mechanical": {
+    "eta_mae": 6.213349979611712e-14
+  },
+  "trajectory": {
+    "final_mean_abs_dev_by_kappa": {
+      "0.5": 0.002013182942405601,
+      "1.0": 0.0020033088617418433,
+      "2.0": 0.001990086170102363,
+      "4.0": 0.002080400802027572,
+      "8.0": 0.0039569065178677604,
+      "16.0": 0.007793996071405835,
+      "32.0": 0.01486536513392398
+    },
+    "overall_mean_abs_dev": 0.006954171443192664
+  }
+}

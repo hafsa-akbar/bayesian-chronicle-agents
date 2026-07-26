@@ -1,0 +1,33 @@
+{
+  "overall": {
+    "pearson": 0.992450497654229,
+    "spearman": 0.9164768158470866,
+    "mae": 0.056882297560299694,
+    "n": 18000
+  },
+  "by_regime": {
+    "committed": {
+      "pearson": 0.9933523959454668,
+      "spearman": 0.9173972013639269,
+      "mae": 0.05782638358021636,
+      "n": 14000
+    },
+    "degroot": {
+      "pearson": 0.9589872372632161,
+      "spearman": 0.49575720975477383,
+      "mae": 0.06609232038158856,
+      "n": 2000
+    },
+    "fj": {
+      "pearson": 0.9920558786337994,
+      "spearman": 0.9758109932348941,
+      "mae": 0.0410636725995941,
+      "n": 2000
+    }
+  },
+  "provenance": {
+    "model_key": "claude-sonnet-4-6",
+    "model_id": "claude-sonnet-4-6",
+    "endpoint": "https://api.anthropic.com/v1/"
+  }
+}

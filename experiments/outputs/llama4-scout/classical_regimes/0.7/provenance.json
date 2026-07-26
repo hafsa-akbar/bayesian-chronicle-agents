@@ -1,0 +1,29 @@
+{
+  "model_key": "llama4-scout",
+  "generator_model_id": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+  "appraiser_model_id": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+  "endpoint": "https://router.huggingface.co/v1",
+  "api_key_env": "HF_API_KEY",
+  "sampling": {
+    "generator": {
+      "temperature": 0.9,
+      "extra_body": {
+        "max_tokens": 512
+      }
+    },
+    "appraiser": {
+      "temperature": 0.0,
+      "extra_body": {
+        "max_tokens": 512
+      }
+    },
+    "probe": {
+      "temperature": 0.0,
+      "extra_body": {
+        "max_tokens": 512
+      }
+    }
+  },
+  "gamma": 0.7,
+  "calibration_json": "/Users/hafsaakbar/Desktop/bca/bca_beta/experiments/calibration/llama4-scout_tau.json"
+}
