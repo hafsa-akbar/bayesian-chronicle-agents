@@ -12,9 +12,9 @@ import re
 from dataclasses import dataclass
 from typing import Optional, Protocol, runtime_checkable
 
-from bca_beta import params
-from bca_beta.calibration import Calibration
-from bca_beta.llm import JSONCache, LLMClient
+from bca import params
+from bca.calibration import Calibration
+from bca.llm import JSONCache, LLMClient
 
 _JSON_BLOCK = re.compile(r"\{.*\}", re.DOTALL)
 

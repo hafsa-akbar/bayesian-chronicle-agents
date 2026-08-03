@@ -10,7 +10,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Hashable, Optional
 
-from bca_beta.belief import BetaBelief
+from bca.belief import BetaBelief
 
 DEFAULT_CONCEPT = "transit_priority"
 

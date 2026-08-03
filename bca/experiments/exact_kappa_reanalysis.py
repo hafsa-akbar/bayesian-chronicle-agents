@@ -15,7 +15,7 @@ Reads  experiments/outputs/<key>/kappa_recovery/<gamma>/events.csv and writes
        exact_kappa_summary.csv  (per-condition, per-seed medians)
        exact_recovery.json      (condition medians, Spearman, rel. error, MAE)
 
-    python -m bca_beta.experiments.exact_kappa_reanalysis
+    python -m bca.experiments.exact_kappa_reanalysis
 """
 from __future__ import annotations
 
@@ -83,6 +83,10 @@ def reanalyze(key: str) -> dict:
 
 def main() -> None:
     for key in MODELS:
+        if not (OUT / key / "kappa_recovery" / GAMMA_DIR / "events.csv").exists():
+            print(f"{key}: no events.csv under kappa_recovery/{GAMMA_DIR} "
+                  f"(run kappa_recovery first) — skipped")
+            continue
         s = reanalyze(key)
         print(f"{key}: mech_err={s['mechanical_max_abs_err']:.1e} "
               f"spearman={s['spearman']:.3f} rel_err={s['relative_error']:.2f} "

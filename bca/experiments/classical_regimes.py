@@ -16,10 +16,10 @@ import networkx as nx
 import numpy as np
 import pandas as pd
 
-from bca_beta import analysis, classical
-from bca_beta.agent import Agent
-from bca_beta.calibration import Calibration
-from bca_beta.engine import build_initial_means, run_round_robin
+from bca import analysis, classical
+from bca.agent import Agent
+from bca.calibration import Calibration
+from bca.engine import build_initial_means, run_round_robin
 
 CONCEPT_ID = "transit_priority"
 A_PLUS = "Aldenvale should expand its rail-transit network"
@@ -514,8 +514,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         return 0
 
     # Build real LLM-backed objects only for a live run.
-    from bca_beta import channel, models
-    from bca_beta.llm import JSONCache
+    from bca import channel, models
+    from bca.llm import JSONCache
 
     spec = models.resolve_spec(model_key=args.model_key, model=args.model)
     appraiser_spec = (

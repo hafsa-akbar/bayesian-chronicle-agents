@@ -1,4 +1,4 @@
-"""bca_beta — a structured, controllable belief-update layer.
+"""bca — a structured, controllable belief-update layer.
 
 A Beta belief-update rule that is *exactly* a Friedkin--Johnsen (FJ) convex-blend
 step with a time-varying susceptibility, plus a calibrated appraiser, language-model

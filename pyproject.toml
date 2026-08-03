@@ -1,5 +1,5 @@
 [project]
-name = "bca_beta"
+name = "bca"
 version = "0.1.0"
 description = "Beta-credence belief layer for Bayesian Chronicle Agents (BCA)"
 readme = "README.md"
@@ -17,9 +17,9 @@ dependencies = [
 [project.optional-dependencies]
 test = ["pytest>=8.0"]
 
-# Run the package in-place from the parent directory:
-#   python -m pytest bca_beta
-#   python -m bca_beta.experiments.classical_regimes
+# Run the package in-place from the repo root:
+#   python -m pytest
+#   python -m bca.experiments.classical_regimes
 [tool.pytest.ini_options]
 addopts = "-q"
 # Silence deprecation warnings emitted from third-party libraries on import

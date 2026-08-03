@@ -10,9 +10,9 @@ import re
 from dataclasses import dataclass
 from typing import Any, Optional, Protocol, runtime_checkable
 
-from bca_beta import params
-from bca_beta.generators import _stance_descriptor
-from bca_beta.llm import JSONCache, LLMClient
+from bca import params
+from bca.generators import _stance_descriptor
+from bca.llm import JSONCache, LLMClient
 
 _INT = re.compile(r"-?\d+")
 
@@ -45,7 +45,7 @@ class OpenAISliderProbe:
         self.model = model
         self.client = client
         self.cache = cache
-        # Sampling params from the centralized policy (bca_beta.params).
+        # Sampling params from the centralized policy (bca.params).
         if chat_params is not None:
             self.chat_params = dict(chat_params)
         else:

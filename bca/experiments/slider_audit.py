@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from bca_beta import analysis
+from bca import analysis
 
 
 def run_slider_audit(sliders_csv: str | Path, out_dir: str | Path, make_plots: bool = True,
@@ -78,7 +78,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     provenance = None
     if args.model_key:
-        from bca_beta import models
+        from bca import models
         spec = models.get_model_spec(args.model_key)
         provenance = {"model_key": spec.key, "model_id": spec.model_id,
                       "endpoint": spec.endpoint_label}

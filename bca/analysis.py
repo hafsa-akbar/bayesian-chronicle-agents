@@ -316,7 +316,7 @@ def variance_by_round(belief_by_round: np.ndarray) -> np.ndarray:
 
 
 def degroot_metrics(belief_by_round: np.ndarray) -> dict:
-    from bca_beta import classical
+    from bca import classical
     bbr = np.asarray(belief_by_round, dtype=float)
     v = variance_by_round(bbr)
     consensus = float(bbr[-1].mean())
@@ -346,7 +346,7 @@ def fj_reference_metrics(belief_by_round, kappas, weight: float = 1.0, gamma: fl
       disagreement, which the discounted dynamics actually reach. ``R²`` of the observed
       terminal beliefs against this reference is then high.
     """
-    from bca_beta import classical
+    from bca import classical
     bbr = np.asarray(belief_by_round, dtype=float)
     kappas = np.asarray(kappas, dtype=float)
     n = bbr.shape[1]

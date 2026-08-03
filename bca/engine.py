@@ -12,8 +12,8 @@ from typing import Sequence
 import networkx as nx
 import numpy as np
 
-from bca_beta.agent import Agent
-from bca_beta.llm import token_counts
+from bca.agent import Agent
+from bca.llm import token_counts
 
 
 def build_initial_means(
@@ -68,7 +68,7 @@ def run_round_robin(
     run-level fields appear (e.g. ``run_id``, ``seed``, ``model``).
 
     Args:
-        agents: Sequence of :class:`~bca_beta.agent.Agent` objects.
+        agents: Sequence of :class:`~bca.agent.Agent` objects.
         graph: Network topology; neighbours of a listener are its speakers.
         rng: Seeded RNG for the pair-update permutation.
         n_rounds: Number of full rounds to simulate.

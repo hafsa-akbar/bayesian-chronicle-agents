@@ -17,7 +17,7 @@ from typing import Any, Optional, Sequence
 import numpy as np
 import pandas as pd
 
-from bca_beta import calibration as cal
+from bca import calibration as cal
 
 DEFAULT_LABELS = Path(__file__).resolve().parents[1] / "appraiser_labels.csv"
 DEFAULT_OUT = Path(__file__).resolve().parent / "outputs" / "appraiser_calibration"
@@ -87,7 +87,7 @@ def fit_and_evaluate(
 
 def appraise_labels(df: pd.DataFrame, appraiser: Any) -> pd.DataFrame:
     """Run the appraiser on every labelled utterance; return a raw-outputs frame."""
-    from bca_beta.llm import token_counts
+    from bca.llm import token_counts
 
     rows = []
     for _, row in df.iterrows():
@@ -139,8 +139,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             print(f"  approx cost(USD): {approx_tokens / 1e6 * args.price_per_1m_tokens:.2f}")
         return 0
 
-    from bca_beta import channel, models
-    from bca_beta.llm import JSONCache
+    from bca import channel, models
+    from bca.llm import JSONCache
 
     spec = models.resolve_spec(model_key=args.model_key, model=args.model)
     out_dir = Path(args.out) if args.out != DEFAULT_OUT else models.default_output_root(spec) / "appraiser_calibration"

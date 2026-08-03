@@ -6,7 +6,7 @@ endpoint, and the environment variable holding that endpoint's API key. Adding a
 model is a single entry in :data:`REGISTRY`; nothing else needs to change.
 
 The sampling parameters are deliberately *not* stored here -- they live in
-:mod:`bca_beta.params` so that every model is driven with identical settings. The only
+:mod:`bca.params` so that every model is driven with identical settings. The only
 per-model call knobs a registry entry may carry are ``extra_body`` (params an endpoint
 requires, e.g. an explicit ``max_tokens`` for the Hugging Face router) and
 ``unsupported_params`` (params an endpoint rejects, dropped with a warning).
@@ -36,7 +36,7 @@ class ModelSpec:
             request (e.g. ``{"max_tokens": 512}`` for the HF router). Applied identically
             to every role, so it never changes the sampling policy.
         unsupported_params: sampling params this endpoint rejects; dropped with a warning
-            rather than silently (see :func:`bca_beta.params.role_chat_params`).
+            rather than silently (see :func:`bca.params.role_chat_params`).
     """
 
     key: str

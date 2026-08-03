@@ -74,7 +74,7 @@ class OpenAIClient:
     @classmethod
     def from_spec(cls, spec: Any, max_calls: Optional[int] = None,
                   env_path: Optional["str | Path"] = None) -> "OpenAIClient":
-        """Build a client for a :class:`~bca_beta.models.ModelSpec`'s endpoint.
+        """Build a client for a :class:`~bca.models.ModelSpec`'s endpoint.
 
         Reads the key from the env var named on the spec (never hardcodes
         ``OPENAI_API_KEY``) and points at the spec's ``base_url`` (``None`` = OpenAI).

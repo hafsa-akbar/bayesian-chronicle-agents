@@ -16,7 +16,7 @@ For each gamma it reports:
 
 Run it with::
 
-    python -m bca_beta.experiments.gamma_sweep_oracle
+    python -m bca.experiments.gamma_sweep_oracle
 
 Outputs (under ``experiments/outputs/gamma_oracle/``): ``gamma_oracle_summary.csv``
 (tidy: gamma, regime, metric, value) and ``gamma_oracle_committed_dose.csv``
@@ -32,9 +32,9 @@ import networkx as nx
 import numpy as np
 import pandas as pd
 
-from bca_beta import analysis
-from bca_beta.engine import run_round_robin
-from bca_beta.experiments.classical_regimes import (
+from bca import analysis
+from bca.engine import run_round_robin
+from bca.experiments.classical_regimes import (
     A_MINUS,
     A_PLUS,
     CONCEPT_ID,

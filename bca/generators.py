@@ -10,8 +10,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Optional, Protocol, runtime_checkable
 
-from bca_beta import params
-from bca_beta.llm import JSONCache, LLMClient
+from bca import params
+from bca.llm import JSONCache, LLMClient
 
 
 @dataclass
@@ -79,7 +79,7 @@ class OpenAIUtteranceGenerator:
         self.model = model
         self.client = client
         self.cache = cache
-        # Sampling params come from the centralized policy (bca_beta.params); callers
+        # Sampling params come from the centralized policy (bca.params); callers
         # may pass fully-resolved ``chat_params`` or override just the temperature.
         if chat_params is not None:
             self.chat_params = dict(chat_params)

@@ -10,7 +10,7 @@ Written to ``experiments/outputs/figures/``:
   fig4_gamma_oracle.png  FJ vs DeGroot final variance across the oracle gamma sweep
                          (run ``gamma_sweep_oracle`` first; it is free)
 
-    python -m bca_beta.experiments.make_figures
+    python -m bca.experiments.make_figures
 """
 from __future__ import annotations
 
@@ -23,8 +23,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from bca_beta import classical
-from bca_beta.experiments.classical_regimes import WEIGHT, build_regime_agents
+from bca import classical
+from bca.experiments.classical_regimes import WEIGHT, build_regime_agents
 
 OUT = Path(__file__).resolve().parent / "outputs"
 FIG = OUT / "figures"

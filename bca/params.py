@@ -3,7 +3,7 @@
 Every model is driven with identical sampling settings, so a difference in results
 reflects the model, not the knobs: the per-role temperatures live here, once, and every
 generator / appraiser / probe reads them from here. The only per-model variation is what
-an endpoint requires or rejects, carried on the :class:`~bca_beta.models.ModelSpec`
+an endpoint requires or rejects, carried on the :class:`~bca.models.ModelSpec`
 (``extra_body`` / ``unsupported_params``) and merged in by :func:`role_chat_params`; a
 dropped param is warned about, never silent.
 """
@@ -13,7 +13,7 @@ import sys
 import warnings
 from typing import Any, Optional
 
-from bca_beta.models import ModelSpec
+from bca.models import ModelSpec
 
 # The ONLY sampling knob, per role. Everything else is left at provider defaults
 # (top_p = 1, no max_tokens, no seed, no penalties) -- the "no other sampling params"

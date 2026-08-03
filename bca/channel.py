@@ -1,8 +1,8 @@
-"""One place that wires a :class:`~bca_beta.models.ModelSpec` into the language channel.
+"""One place that wires a :class:`~bca.models.ModelSpec` into the language channel.
 
 Every experiment builds its generator / appraiser / slider-probe through
 :func:`build_channel`, so there is no per-model, per-experiment copy-paste: switching the
-model key swaps the endpoint and model id while the sampling policy (``bca_beta.params``)
+model key swaps the endpoint and model id while the sampling policy (``bca.params``)
 stays identical. :func:`provenance_block` records exactly what was used, for run metrics.
 """
 from __future__ import annotations
@@ -10,13 +10,13 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Optional
 
-from bca_beta import params
-from bca_beta.appraisers import OpenAIStanceAppraiser
-from bca_beta.calibration import Calibration
-from bca_beta.generators import OpenAIUtteranceGenerator
-from bca_beta.llm import JSONCache, OpenAIClient
-from bca_beta.models import ModelSpec
-from bca_beta.probes import OpenAISliderProbe
+from bca import params
+from bca.appraisers import OpenAIStanceAppraiser
+from bca.calibration import Calibration
+from bca.generators import OpenAIUtteranceGenerator
+from bca.llm import JSONCache, OpenAIClient
+from bca.models import ModelSpec
+from bca.probes import OpenAISliderProbe
 
 
 @dataclass
