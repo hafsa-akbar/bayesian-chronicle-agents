@@ -1,4 +1,4 @@
-# bca — Bayesian Chronicle Agents (Beta belief layer)
+# Bayesian Chronicle Agents (Beta belief layer)
 
 A small, inspectable belief-update layer for generative agents: *what* an agent
 believes follows a transparent probabilistic rule; *how* it speaks is left to an LLM.
